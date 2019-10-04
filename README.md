@@ -1,5 +1,5 @@
 # Steam-Trade-Bot
-Bot built in for the Steam network to trade virtual currency autonomously and generate real-dollar profit.
+Bot built in the Steam network to trade virtual currency autonomously and generate real-dollar profit.
 
 Packages used:
 
