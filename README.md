@@ -4,10 +4,12 @@ Bot built in for the Steam network to trade virtual currency autonomously and ge
 Packages used:
 
     Steam
-    
-    API.AI
-    
-    Steam Inventories
+    SteamInventories
+    SteamTOTP
+    SteamUser
+    SteamCommunity
+    TradeOfferManager
+    SteamUserInfo
 
 Bot accepts commands and commands can be extended:
 
