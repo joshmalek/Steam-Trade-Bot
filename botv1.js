@@ -13,8 +13,8 @@ var steamFriends = new Steam.SteamFriends(steamClient);
 steamClient.connect();
 steamClient.on('connected', function() {
   steamUser.logOn({
-    account_name: 'TheLevelerSupreme',
-    password: 'Brodaniel6'
+    account_name: '',
+    password: ''
   });
 });
 
