@@ -20,7 +20,6 @@ const manager = new TradeOfferManager({
   steam: client,
   community: community,
   language: 'en'
-
 });
 
 var outcome = "";
@@ -42,13 +41,13 @@ value = client.steamID.isValid();
   {
     outcome = "VALID";
   }
-  else{
+  else
+  {
     outcome = "INVALID";
   }
   console.log("Profile is " + outcome);
   client.setPersona(SteamUser.EPersonaState.Online);
   client.gamesPlayed(308040);
-
 })
 
 
@@ -66,43 +65,52 @@ client.on('friendRelationship', (steamid, relationship) => {
 client.on("friendMessage", function(steamID, message){
   var id = "";
 
-  if(steamID == config.ownerID){
+  if(steamID == config.ownerID)
+  {
     id = "ADMIN";
   }
-  else if(steamID == config.yangID){
+  else if(steamID == config.yangID)
+  {
     id = "YANG";
   }
-  else{
+  else
+  {
     id = "CUSTOMER";
   }
 
   //ADMIN COMMANDS
-  if((message == "!status") && (id = "ADMIN")){
+  if((message == "!status") && (id = "ADMIN"))
+  {
     client.chatMessage(steamID,"I am online.")
     client.chatMessage(steamID,"You have "+ stats.completeTrades + " completed trades")
   }
   //seperate admin commands from normal commands
-  else if((message == "!status") && (id != "ADMIN")){
+  else if((message == "!status") && (id != "ADMIN"))
+  {
     client.chatMessage(steamID, "You don't have access.")
   }
   //Normal commands
-  if(message == "!start"){
+  if(message == "!start")
+  {
     console.log("[" + steamID + "] says: " + message.bold);
     console.log("Welcome to Keys2Cards 0.0.3.  Enter '!commands' to view available commands.".reset);
     client.chatMessage(steamID, "Hello, and welcome to Keys2Cards 0.0.3.  Enter '!commands' to view available commands.");
   }
-  else if(message == "!commands"){
+  else if(message == "!commands")
+  {
     console.log("[" + steamID + "] says: " + message.bold);
     console.log("Available commands:\n !id \n !buy".reset);
     client.chatMessage(steamID, "Available commands:\n !id \n !buy");
   }
-  else if(message == "!id"){
+  else if(message == "!id")
+  {
     console.log("[" + steamID + "] says: " + message.bold);
     console.log("You are a ".reset + id);
     client.chatMessage(steamID, "You are a " + id);
   }
   //retrieve inventory worth and return items
-  else if(message == "!inven"){
+  else if(message == "!inven")
+  {
     console.log("Checking inventory...")
     steamInventory.get({
       appID: 730,
@@ -117,7 +125,8 @@ client.on("friendMessage", function(steamID, message){
 
   }
   //print commands as recieved to command line
-  else{
+  else
+  {
     console.log("[" + steamID + "] says: " + message.bold);
     console.log("Type '!start' to continue".reset);
     client.chatMessage(steamID, "Type '!start' to continue");
@@ -129,7 +138,6 @@ client.on("friendMessage", function(steamID, message){
 //set cookies for the session
 client.on('webSession', (sessionid, cookies) => {
     manager.setCookies(cookies);
-
     community.setCookies(cookies);
     community.startConfirmationChecker(10000, config.identitySecret);
 });
@@ -156,46 +164,59 @@ function declineOffer(offer) {
 //Helper function to process offer
 function processOffer(offer) {
     //If offer is glitched, decline
-    if (offer.isGlitched() || offer.state === 11) {
+    if (offer.isGlitched() || offer.state === 11) 
+    {
         console.log("Offer was glitched, declining.");
         declineOffer(offer);
     } 
     //if offer is from admin, accept
-    else if (offer.partner.getSteamID64() == config.ownerID) {
+    else if (offer.partner.getSteamID64() == config.ownerID) 
+    {
         console.log("Offer is from admin")
         acceptOffer(offer);
     }
     //otherwise, calculate value of our items vs. theirs
-    else {
+    else 
+    {
         var ourItems = offer.itemsToGive;
         var theirItems = offer.itemsToReceive;
         var ourValue = 0;
         var theirValue = 0;
-        for (var i in ourItems) {
+        for (var i in ourItems) 
+        {
             var item = ourItems[i].market_name;
-            if(Prices[item]) {
+            if(Prices[item]) 
+            {
                 ourValue += Prices[item].sell;
-            } else {
+            } 
+            else 
+            {
                 console.log("Invalid Value.");
                 ourValue += 99999;
             }
         }
-        for(var i in theirItems) {
+        for(var i in theirItems) 
+        {
             var item= theirItems[i].market_name;
-            if(Prices[item]) {
+            if(Prices[item]) 
+            {
                 theirValue += Prices[item].buy;
-            } else {
-            console.log("Their value was different.")
+            } 
+            else 
+            {
+                console.log("Their value was different.")
             }
         }
 
     console.log("Our value: " + ourValue);
     console.log("Their value: " + theirValue);
     //if ours is worth less than theirs, accept
-    if (ourValue <= theirValue) {
+    if (ourValue <= theirValue) 
+    {
         acceptOffer(offer);
     } 
-    else {
+    else 
+    {
         declineOffer(offer);
     }
   }
