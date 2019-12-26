@@ -13,7 +13,7 @@ var fs = require('fs');
 var fileName = './stats.json';
 var file = require(fileName);
 
-
+//Initalize new instances of our enviroments
 const client = new SteamUser();
 const community = new SteamCommunity();
 const manager = new TradeOfferManager({
@@ -25,6 +25,7 @@ const manager = new TradeOfferManager({
 
 var outcome = "";
 var value = "";
+//Retrieve credentials and log in
 client.logOn({
   accountName : config.username,
   password : config.password,
@@ -54,12 +55,10 @@ value = client.steamID.isValid();
 //ADDING A FRIEND AND FIRST CHAT
 client.on('friendRelationship', (steamid, relationship) => {
     if (relationship === 2) {
-
         var name = "";
         client.addFriend(steamid);
         client.chatMessage(steamid, 'Hello there! Thanks for adding me! Type !start to continue.');
         console.log(">New Event: Friend [" + steamid + "] added");
-
     }
 });
 
@@ -77,19 +76,16 @@ client.on("friendMessage", function(steamID, message){
     id = "CUSTOMER";
   }
 
-//ADMIN COMMANDS
-if((message == "!status") && (id = "ADMIN")){
-  client.chatMessage(steamID,"I am online.")
-  client.chatMessage(steamID,"You have "+ stats.completeTrades + " completed trades")
-
-
-
-}
-else if((message == "!status") && (id != "ADMIN")){
-  client.chatMessage(steamID, "You don't have access.")
-}
-
-
+  //ADMIN COMMANDS
+  if((message == "!status") && (id = "ADMIN")){
+    client.chatMessage(steamID,"I am online.")
+    client.chatMessage(steamID,"You have "+ stats.completeTrades + " completed trades")
+  }
+  //seperate admin commands from normal commands
+  else if((message == "!status") && (id != "ADMIN")){
+    client.chatMessage(steamID, "You don't have access.")
+  }
+  //Normal commands
   if(message == "!start"){
     console.log("[" + steamID + "] says: " + message.bold);
     console.log("Welcome to Keys2Cards 0.0.3.  Enter '!commands' to view available commands.".reset);
@@ -105,6 +101,7 @@ else if((message == "!status") && (id != "ADMIN")){
     console.log("You are a ".reset + id);
     client.chatMessage(steamID, "You are a " + id);
   }
+  //retrieve inventory worth and return items
   else if(message == "!inven"){
     console.log("Checking inventory...")
     steamInventory.get({
@@ -119,6 +116,7 @@ else if((message == "!status") && (id != "ADMIN")){
     });
 
   }
+  //print commands as recieved to command line
   else{
     console.log("[" + steamID + "] says: " + message.bold);
     console.log("Type '!start' to continue".reset);
@@ -128,14 +126,14 @@ else if((message == "!status") && (id != "ADMIN")){
 
 
 
-
+//set cookies for the session
 client.on('webSession', (sessionid, cookies) => {
     manager.setCookies(cookies);
 
     community.setCookies(cookies);
     community.startConfirmationChecker(10000, config.identitySecret);
 });
-
+//Helper function to accept offer
 function acceptOffer(offer) {
     offer.accept((err) => {
         community.checkConfirmations();
@@ -148,21 +146,27 @@ function acceptOffer(offer) {
     });
 })
 }
+//Helper function to decline offer
 function declineOffer(offer) {
     offer.decline((err) => {
         console.log("We Declined an offer");
         if (err) console.log("There was an error declining the offer.");
     });
 }
-
+//Helper function to process offer
 function processOffer(offer) {
+    //If offer is glitched, decline
     if (offer.isGlitched() || offer.state === 11) {
         console.log("Offer was glitched, declining.");
         declineOffer(offer);
-    } else if (offer.partner.getSteamID64() == config.ownerID) {
+    } 
+    //if offer is from admin, accept
+    else if (offer.partner.getSteamID64() == config.ownerID) {
         console.log("Offer is from admin")
         acceptOffer(offer);
-    }else {
+    }
+    //otherwise, calculate value of our items vs. theirs
+    else {
         var ourItems = offer.itemsToGive;
         var theirItems = offer.itemsToReceive;
         var ourValue = 0;
@@ -187,17 +191,18 @@ function processOffer(offer) {
 
     console.log("Our value: " + ourValue);
     console.log("Their value: " + theirValue);
-
+    //if ours is worth less than theirs, accept
     if (ourValue <= theirValue) {
         acceptOffer(offer);
-    } else {
+    } 
+    else {
         declineOffer(offer);
     }
   }
 }
 
 client.setOption("promptSteamGuardCode", false);
-
+//if a new offer is recieved, process as needed asynchrously 
 manager.on('newOffer', (offer) => {
      processOffer(offer);
 });
